@@ -1,0 +1,142 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 11.1
+-- Dumped by pg_dump version 11.1
+
+-- Started on 2018-11-17 03:07:43
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 2817 (class 1262 OID 13012)
+-- Name: postgres; Type: DATABASE; Schema: -; Owner: postgres
+--
+
+CREATE DATABASE postgres WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'Russian_Russia.1251' LC_CTYPE = 'Russian_Russia.1251';
+
+
+ALTER DATABASE postgres OWNER TO postgres;
+
+\connect postgres
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 2818 (class 0 OID 0)
+-- Dependencies: 2817
+-- Name: DATABASE postgres; Type: COMMENT; Schema: -; Owner: postgres
+--
+
+COMMENT ON DATABASE postgres IS 'default administrative connection database';
+
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- TOC entry 197 (class 1259 OID 16386)
+-- Name: message; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.message (
+    id integer NOT NULL,
+    message text NOT NULL,
+    "user" text NOT NULL,
+    my boolean NOT NULL,
+    date bigint NOT NULL
+);
+
+
+ALTER TABLE public.message OWNER TO postgres;
+
+--
+-- TOC entry 196 (class 1259 OID 16384)
+-- Name: message_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.message_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.message_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 2819 (class 0 OID 0)
+-- Dependencies: 196
+-- Name: message_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.message_id_seq OWNED BY public.message.id;
+
+
+--
+-- TOC entry 2686 (class 2604 OID 16389)
+-- Name: message id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.message ALTER COLUMN id SET DEFAULT nextval('public.message_id_seq'::regclass);
+
+
+--
+-- TOC entry 2811 (class 0 OID 16386)
+-- Dependencies: 197
+-- Data for Name: message; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.message (id, message, "user", my, date) VALUES (1, 'wadsdwadaw
+', 'me', true, 1542400514859);
+INSERT INTO public.message (id, message, "user", my, date) VALUES (2, 'eafeaefgdtgtd
+', 'me', true, 1542400535003);
+INSERT INTO public.message (id, message, "user", my, date) VALUES (3, 'awdad123', 'otherPerson', false, 1542400535000);
+INSERT INTO public.message (id, message, "user", my, date) VALUES (4, 'awdad123', 'otherPerson', false, 1542400535998);
+INSERT INTO public.message (id, message, "user", my, date) VALUES (5, 'awdad1Sx123as23', 'otherPerson', false, 1542400535990);
+
+
+--
+-- TOC entry 2820 (class 0 OID 0)
+-- Dependencies: 196
+-- Name: message_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.message_id_seq', 5, true);
+
+
+--
+-- TOC entry 2688 (class 2606 OID 16394)
+-- Name: message message_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.message
+    ADD CONSTRAINT message_pkey PRIMARY KEY (id);
+
+
+-- Completed on 2018-11-17 03:07:55
+
+--
+-- PostgreSQL database dump complete
+--
+
