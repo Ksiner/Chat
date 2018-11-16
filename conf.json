@@ -1,0 +1,4 @@
+{
+    "listen": "your adress wich server will listen to",
+    "dbconn": "user=postgres password=yourpass dbname=postgres sslmode=disable"
+}
