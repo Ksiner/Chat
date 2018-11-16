@@ -1,6 +1,6 @@
 //import {$,jQuery} from 'jQuery'
 
-var addr = "http://176.214.9.137";
+var addr = "http://192.168.1.3:8080";
 var root = document.getElementById("root");
 debugger;
 var messageContainer = document.getElementsByClassName("messageDiv")[0];
