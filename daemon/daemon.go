@@ -31,6 +31,8 @@ func (cfg *Config) Start() error {
 	return nil
 }
 
+/// Signal handling in libraries should be avoided except specialized signal handling libraries (ex. ssh)
+/// Provide "graceful stop" channel or method in server. Signals should be handled from main package or some sort of package managing particular application
 func WaitForSignal() {
 	ch := make(chan os.Signal)
 	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)

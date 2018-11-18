@@ -20,6 +20,9 @@ func Run(m *model.Model, listener net.Listener) {
 	http.Handle("/scripts/", http.FileServer(http.Dir("")))
 	http.Handle("/css/", http.FileServer(http.Dir("")))
 	http.Handle("/messages/", messages())
+
+	/// Following 2 actions should be done with GET and POST methods
+	/// BTW you can use gorilla/mux and other gorilla's librarie for REST apps. They're really handy
 	http.Handle("/messages/get", getMessages(m))
 	http.Handle("/messages/send", sendMessage(m))
 	go server.Serve(listener)
@@ -31,7 +34,8 @@ func messages() http.Handler {
 	})
 }
 
-func getMessages(m *model.Model) http.Handler {
+/// Maybe you wanna get some kind of dependency injection?
+func getMessages(m *model.Model) http.Handler { /// Maybe it's better to implement this as method of particular model.Model?
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if messages, err := m.Messages(); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
