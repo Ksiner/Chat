@@ -1,16 +1,31 @@
 //import {$,jQuery} from 'jQuery'
+messageTemplateInit();
+
+
 
 var addr = "http://192.168.1.3:8080";
+var currentUser = "Me"
 var root = document.getElementById("root");
 debugger;
 var messageContainer = document.getElementsByClassName("messageDiv")[0];
+var userContainer = document.getElementsByClassName("userDiv")[0];
 var messageInputDiv = document.getElementsByClassName("messageInputDiv")[0];
 var messageInputArea = document.getElementsByClassName("messageInputArea")[0];
 messageInputArea.onkeyup = sendMessage;
 
-
+var messageGetUser = addr+"/messages/users";
 var messageGetAddr = addr+"/messages/get";
 var messagePostAddr = addr+"/messages/send";
+
+function messageTemplateInit(){
+    let user = {
+        name:currentUser
+    };
+
+    ajax_post_users(messageGetUser,callbackGet,insertUserDivs)
+    ajax_get(messageGetAddr, callbackGet,insetrIntoDivFileds);
+    setTimeout(messageTemplateInit,1000);
+}
 
 
 function unixToDate(unix_timestamp){
@@ -40,25 +55,33 @@ function insetrIntoDivFileds(div,element){
     messageContainer.appendChild(div);
 }
 
+function insertUserDivs(div,element){
+    let userDiv = document.createElement("div");
+    let userDivChild = document.createElement("p");
+    userDivChild.innerText=element;
+    userDiv.appendChild(userDivChild);
+    userContainer.appendChild(userDiv);
+}
 
-var callbackGet = function (data) {
+var callbackGet = function (data,elemAddFunc) {
     data.forEach(element => {
         if (element.my) {
             debugger;
             let myMessageDv = initDiv("container", "time-right");
-            insetrIntoDivFileds(myMessageDv,element);
+            elemAddFunc(myMessageDv,element);
         } else {
             debugger;
             let = messageDiv = initDiv("container darker", "time-left");
-            insetrIntoDivFileds(messageDiv,element);
+            elemAddFunc(messageDiv,element);
         }
     });
 }
 
-ajax_get(messageGetAddr, callbackGet);
 
 
-function ajax_get(url, callback) {
+
+
+function ajax_get(url, callback,elemAddFunc) {
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function () {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
@@ -68,20 +91,36 @@ function ajax_get(url, callback) {
             } catch (err) {
                 console.log(err.message + " in " + xmlhttp.responseText);
             }
-            callback(data);
+            if(elemAddFunc !== undefined){
+                callback(data,elemAddFunc)
+            }else{
+                callback(data);
+            }
         }
     };
     xmlhttp.open("GET", url, true);
     xmlhttp.send();
 }
 
-function ajax_post(Obj,url,callback){
+function ajax_post_users(Obj,url,callback){
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.open("POST",url,true);
     xmlhttp.setRequestHeader("Content-Type","application/json; charset=utf-8");
     xmlhttp.onreadystatechange = function(){
         if (xmlhttp.readyState === 4 && xmlhttp.status === 200){
-            callback(initDiv("container", "time-right"),Obj);
+            callback(JSON.parse(xmlhttp.responseText),insertUserDivs);
+        }
+    }
+    xmlhttp.send(JSON.stringify(obj));
+}
+
+function ajax_post_message(Obj,url,callback){
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.open("POST",url,true);
+    xmlhttp.setRequestHeader("Content-Type","application/json; charset=utf-8");
+    xmlhttp.onreadystatechange = function(){
+        if (xmlhttp.readyState === 4 && xmlhttp.status === 200){
+            alert("Message sended!");
         }
     }
     xmlhttp.send(JSON.stringify(obj));
@@ -105,13 +144,12 @@ function initDiv(divClassName, spanClassName) {
 function sendMessage(event){
     if(event.keyCode==13){
         obj = {
-            user: "me",
+            user: currentUser,
             message: messageInputArea.value/*.replace('\n','')*/,
             date: Date.now(),
             my:true
         };
-        ajax_post(obj,messagePostAddr,insetrIntoDivFileds);
-        alert("Message sended!");
+        ajax_post_message(obj,messagePostAddr,insetrIntoDivFileds);
         messageInputArea.value = "";
     }
 }
