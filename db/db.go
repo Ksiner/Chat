@@ -41,7 +41,7 @@ func (cmds *sqlCommands) PrepareStatements() error {
 	// } else {
 	// 	cmds.sqlSelectCurrentUserCmd = sqlSelectCurrentUserCmd
 	// }
-	if sqlSelectUsersCmd, err := cmds.conn.Preparex("Select \"user\" from public.\"User\""); err != nil {
+	if sqlSelectUsersCmd, err := cmds.conn.PrepareNamed("Select \"user\" from public.\"User\" where \"user\"!=:name"); err != nil {
 		return err
 	} else {
 		cmds.sqlSelectUsersCmd = sqlSelectUsersCmd
@@ -70,6 +70,14 @@ func (cmds *sqlCommands) SelectMessages() ([]*model.Message, error) {
 		return nil, err
 	}
 	return messages, nil
+}
+
+func (cmds *sqlCommands) SelectUsers(currentUser model.User)([]*model.User,error){
+	users := make([]*model.User)
+	if err:=cmds.sqlSelectUsersCmd.Select(&users,currentUser);err!=nil{
+		return err
+	}
+	return users,nil
 }
 
 func (cmds *sqlCommands) InsertMessage(message model.Message) error {

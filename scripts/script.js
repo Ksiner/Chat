@@ -18,7 +18,11 @@ var messageGetAddr = addr+"/messages/get";
 var messagePostAddr = addr+"/messages/send";
 
 function messageTemplateInit(){
-    ajax_get(messageGetUser,callbackGet,insertUserDivs)
+    let user = {
+        name:currentUser
+    };
+
+    ajax_post_users(messageGetUser,callbackGet,insertUserDivs)
     ajax_get(messageGetAddr, callbackGet,insetrIntoDivFileds);
     setTimeout(messageTemplateInit,1000);
 }
@@ -68,7 +72,7 @@ var callbackGet = function (data,elemAddFunc) {
         } else {
             debugger;
             let = messageDiv = initDiv("container darker", "time-left");
-            insetrIntoDivFileds(messageDiv,element);
+            elemAddFunc(messageDiv,element);
         }
     });
 }
@@ -98,13 +102,25 @@ function ajax_get(url, callback,elemAddFunc) {
     xmlhttp.send();
 }
 
-function ajax_post(Obj,url,callback){
+function ajax_post_users(Obj,url,callback){
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.open("POST",url,true);
     xmlhttp.setRequestHeader("Content-Type","application/json; charset=utf-8");
     xmlhttp.onreadystatechange = function(){
         if (xmlhttp.readyState === 4 && xmlhttp.status === 200){
-            callback(initDiv("container", "time-right"),Obj);
+            callback(JSON.parse(xmlhttp.responseText),insertUserDivs);
+        }
+    }
+    xmlhttp.send(JSON.stringify(obj));
+}
+
+function ajax_post_message(Obj,url,callback){
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.open("POST",url,true);
+    xmlhttp.setRequestHeader("Content-Type","application/json; charset=utf-8");
+    xmlhttp.onreadystatechange = function(){
+        if (xmlhttp.readyState === 4 && xmlhttp.status === 200){
+            alert("Message sended!");
         }
     }
     xmlhttp.send(JSON.stringify(obj));
@@ -128,13 +144,12 @@ function initDiv(divClassName, spanClassName) {
 function sendMessage(event){
     if(event.keyCode==13){
         obj = {
-            user: "me",
+            user: currentUser,
             message: messageInputArea.value/*.replace('\n','')*/,
             date: Date.now(),
             my:true
         };
-        ajax_post(obj,messagePostAddr,insetrIntoDivFileds);
-        alert("Message sended!");
+        ajax_post_message(obj,messagePostAddr,insetrIntoDivFileds);
         messageInputArea.value = "";
     }
 }
