@@ -20,6 +20,12 @@
     resize: none;
 }
 
+.userDiv{
+    height: 500px;
+    width:400px;
+    overflow:auto;
+}
+
 .messageDiv{
     margin: auto;
     height: 500px;

@@ -20,6 +20,7 @@ func Run(m *model.Model, listener net.Listener) {
 	http.Handle("/scripts/", http.FileServer(http.Dir("")))
 	http.Handle("/css/", http.FileServer(http.Dir("")))
 	http.Handle("/messages/", messages())
+	http.Handle("/messages/users")
 	http.Handle("/messages/get", getMessages(m))
 	http.Handle("/messages/send", sendMessage(m))
 	go server.Serve(listener)
@@ -28,6 +29,37 @@ func Run(m *model.Model, listener net.Listener) {
 func messages() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "message.html")
+	})
+}
+
+func getUsers(m *model.Model) http.Handler{
+	return http.HandlerFunc(func(w http.ResponseWriter,r *http.Request){
+		if body,err:= ioutil.ReadAll(r.Body);err!=nil{
+			fmt.Printf("Error! %v", err.Error())
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		} else{
+			currentUser:= *model.User{}
+			if err:= json.Unmarshal(body,&currentUser);err!=nil{
+				fmt.Printf("Error! %v", err.Error())
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			} else{
+				if users,err:= m.GetUsers(currentUser);err!=nil{
+					fmt.Printf("Error! %v", err.Error())
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+				} else{
+					if usersJSON,err:=json.Marshal(users);err!=nil{
+						fmt.Printf("Error! %v", err.Error())
+						http.Error(w, err.Error(), http.StatusInternalServerError)
+					} else{
+						if _,err:=w.Write(usersJSON);err!=nil{
+							fmt.Printf("Error! %v", err.Error())
+							http.Error(w, err.Error(), http.StatusInternalServerError)
+						}
+					}
+				}
+			}
+		}
+		
 	})
 }
 

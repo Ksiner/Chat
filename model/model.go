@@ -3,15 +3,16 @@ package model
 type dbCommands interface {
 	SelectMessages() ([]*Message, error)
 	InsertMessage(Message) error
+	SelectUsers(User) ([]*User,error)
 }
 
 type Model struct {
 	dbCommands
 }
 
-// type User struct {
-// 	Name string `json:name`
-// }
+ type User struct {
+ 	Name string `json:name`
+ }
 
 // type FromToUsers struct {
 // 	Userfrom User `json:userfrom`
@@ -31,6 +32,10 @@ func New(cmds dbCommands) *Model {
 
 func (m *Model) Messages() ([]*Message, error) {
 	return m.SelectMessages()
+}
+
+func (m *Model) GetUsers(currentUser User) ([]*User,error){
+	return m.SelectUsers(currentUser)
 }
 
 func (m *Model) AddMessage(message Message) error {
