@@ -1,12 +1,13 @@
 package main
 
 import (
-	"Chat/daemon"
+	"Chat/daemon" /// w/o go mod it doesn't work
+	"context"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
+	"log"
 
-	_ "github.com/lib/pq"
+	_ "github.com/lib/pq" /// it should be a strong need to import package into current one
 )
 
 type Config struct {
@@ -15,6 +16,16 @@ type Config struct {
 }
 
 func parseConfigFile() (*daemon.Config, error) {
+	/// BTW it can be refactored in future
+	/*
+		if ...; err!=nil{
+			return ...
+		}
+		if ...; err!=nil{
+			return ...
+		}
+		return ...
+	*/
 	var cfg Config
 	if byteCfg, err := ioutil.ReadFile("conf.json"); err != nil {
 		return nil, err
@@ -23,20 +34,25 @@ func parseConfigFile() (*daemon.Config, error) {
 			return nil, err
 		}
 		daemonCfg := &daemon.Config{Listen: cfg.Listen}
-		daemonCfg.Db.CnString = cfg.Dbconn
+		daemonCfg.Db.CnString = cfg.Dbconn /// it can be done in declaration statement eralier
 		return daemonCfg, nil
 	}
 }
 
-func main() {
+func WaitForSignal(ctx context.Context) {
+	<-ctx.Done()
+	log.Panicf("Server is shutted down!")
+}
 
+func main() {
 	cfg, err := parseConfigFile()
 	if err != nil {
-		fmt.Printf("Error in main! %v \n", err.Error())
-		return
+		log.Panicf("Error in main! %v \n", err.Error())
+		/// it can be done with log.Panic() or simply panic()
 	}
-	if err := cfg.Start(); err != nil {
-		fmt.Printf("Error in main! %v \n", err.Error())
-		return
+	context, err := cfg.Start()
+	if err != nil {
+		log.Panicf("Error in main! %v \n", err.Error())
 	}
+	WaitForSignal(context)
 }

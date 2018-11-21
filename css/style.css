@@ -11,6 +11,7 @@
     margin:auto;
     height: 50px;
     width: 400px;
+    float: right;
 }
 
 .messageInputArea{
@@ -18,12 +19,14 @@
     width: 100%;
     overflow: auto;
     resize: none;
+    
 }
 
 .userDiv{
     height: 500px;
     width:400px;
     overflow:auto;
+    float: left;
 }
 
 .messageDiv{
@@ -31,6 +34,7 @@
     height: 500px;
     width:400px;
     overflow:auto;
+    float: right;
 }
 
 /* Darker chat container */

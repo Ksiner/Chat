@@ -12,12 +12,12 @@ type Config struct {
 }
 
 type sqlCommands struct {
-	conn                    *sqlx.DB
+	conn *sqlx.DB
 	// sqlSelectCurrentUserCmd *sqlx.NamedStmt
-	sqlSelectUsersCmd       *sqlx.NamedStmt
+	//sqlSelectUsersCmd       *sqlx.NamedStmt
 	// sqlInsertUserCmd        *sqlx.NamedStmt
-	sqlSelectMessagesCmd    *sqlx.Stmt
-	sqlInsertMessageCmd     *sqlx.NamedStmt
+	sqlSelectMessagesCmd *sqlx.Stmt
+	sqlInsertMessageCmd  *sqlx.NamedStmt
 }
 
 func InitDbCmds(cfg Config) (*sqlCommands, error) {
@@ -41,22 +41,22 @@ func (cmds *sqlCommands) PrepareStatements() error {
 	// } else {
 	// 	cmds.sqlSelectCurrentUserCmd = sqlSelectCurrentUserCmd
 	// }
-	if sqlSelectUsersCmd, err := cmds.conn.PrepareNamed("Select \"user\" from public.\"User\" where \"user\"!=:name"); err != nil {
-		return err
-	} else {
-		cmds.sqlSelectUsersCmd = sqlSelectUsersCmd
-	}
+	// if sqlSelectUsersCmd, err := cmds.conn.PrepareNamed("Select \"user\" from public.\"User\" where \"user\"!=:name"); err != nil {
+	// 	return err
+	// } else {
+	// 	cmds.sqlSelectUsersCmd = sqlSelectUsersCmd
+	// }
 	// if sqlInsertUserCmd, err := cmds.conn.PrepareNamed("Insert into \"User\" values(:name)"); err != nil {
 	// 	return err
 	// } else {
 	// 	cmds.sqlInsertUserCmd = sqlInsertUserCmd
 	// }
-	if sqlSelectMessagesCmd, err := cmds.conn.Preparex("Select message,\"user\" as user,date,my FROM message ORDER BY date"); err != nil {
+	if sqlSelectMessagesCmd, err := cmds.conn.Preparex("Select message,\"user\" as user,date FROM message ORDER BY date"); err != nil {
 		return err
 	} else {
 		cmds.sqlSelectMessagesCmd = sqlSelectMessagesCmd
 	}
-	if sqlInsertMessageCmd, err := cmds.conn.PrepareNamed("INSERT INTO message (message,\"user\",date,my) VALUES (:message,:user,:date,:my)"); err != nil {
+	if sqlInsertMessageCmd, err := cmds.conn.PrepareNamed("INSERT INTO message (message,\"user\",date) VALUES (:message,:user,:date)"); err != nil {
 		return err
 	} else {
 		cmds.sqlInsertMessageCmd = sqlInsertMessageCmd
@@ -72,13 +72,13 @@ func (cmds *sqlCommands) SelectMessages() ([]*model.Message, error) {
 	return messages, nil
 }
 
-func (cmds *sqlCommands) SelectUsers(currentUser model.User)([]*model.User,error){
-	users := make([]*model.User)
-	if err:=cmds.sqlSelectUsersCmd.Select(&users,currentUser);err!=nil{
-		return err
-	}
-	return users,nil
-}
+// func (cmds *sqlCommands) SelectUsers(currentUser model.User)([]*model.User,error){
+// 	users := make([]*model.User)
+// 	if err:=cmds.sqlSelectUsersCmd.Select(&users,currentUser);err!=nil{
+// 		return err
+// 	}
+// 	return users,nil
+// }
 
 func (cmds *sqlCommands) InsertMessage(message model.Message) error {
 	if _, err := cmds.sqlInsertMessageCmd.Exec(message); err != nil {
