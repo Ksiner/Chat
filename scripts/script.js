@@ -3,9 +3,10 @@ messageTemplateInit();
 
 
 
-var addr = "http://192.168.1.3:8080";
-var currentUser = "Me"
+var addr = "http://192.168.1.104:8080";
+var currentUser = "me"
 var root = document.getElementById("root");
+var dataArray = new Array();
 debugger;
 var messageContainer = document.getElementsByClassName("messageDiv")[0];
 var userContainer = document.getElementsByClassName("userDiv")[0];
@@ -13,17 +14,14 @@ var messageInputDiv = document.getElementsByClassName("messageInputDiv")[0];
 var messageInputArea = document.getElementsByClassName("messageInputArea")[0];
 messageInputArea.onkeyup = sendMessage;
 
-var messageGetUser = addr+"/messages/users";
-var messageGetAddr = addr+"/messages/get";
-var messagePostAddr = addr+"/messages/send";
+//var messageGetUser = addr+"/messages/users";
+var messageAddr = addr+"/messages/request";
+// var messageGetAddr = addr+"/messages/get";
+// var messagePostAddr = addr+"/messages/send";
 
 function messageTemplateInit(){
-    let user = {
-        name:currentUser
-    };
-
-    ajax_post_users(messageGetUser,callbackGet,insertUserDivs)
-    ajax_get(messageGetAddr, callbackGet,insetrIntoDivFileds);
+    // ajax_post_users(messageAddr,callbackGet,insertUserDivs);
+    ajax_get(messageAddr, callbackGet,insetrIntoDivFileds);
     setTimeout(messageTemplateInit,1000);
 }
 
@@ -65,15 +63,18 @@ function insertUserDivs(div,element){
 
 var callbackGet = function (data,elemAddFunc) {
     data.forEach(element => {
-        if (element.my) {
-            debugger;
-            let myMessageDv = initDiv("container", "time-right");
-            elemAddFunc(myMessageDv,element);
-        } else {
-            debugger;
-            let = messageDiv = initDiv("container darker", "time-left");
-            elemAddFunc(messageDiv,element);
-        }
+        if(dataArray.find(cacheElem=>JSON.stringify(cacheElem)==JSON.stringify(element))==undefined){
+            dataArray.push(element);
+            if (element.user === currentUser) {
+                debugger;
+                let myMessageDv = initDiv("container", "time-right");
+                elemAddFunc(myMessageDv,element);
+            } else {
+                debugger;
+                let = messageDiv = initDiv("container darker", "time-left");
+                elemAddFunc(messageDiv,element);
+            }
+        } 
     });
 }
 
@@ -149,7 +150,7 @@ function sendMessage(event){
             date: Date.now(),
             my:true
         };
-        ajax_post_message(obj,messagePostAddr,insetrIntoDivFileds);
+        ajax_post_message(obj,messageAddr,insetrIntoDivFileds);
         messageInputArea.value = "";
     }
 }

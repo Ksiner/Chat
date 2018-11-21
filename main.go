@@ -2,9 +2,10 @@ package main
 
 import (
 	"Chat/daemon" /// w/o go mod it doesn't work
+	"context"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
+	"log"
 
 	_ "github.com/lib/pq" /// it should be a strong need to import package into current one
 )
@@ -38,15 +39,20 @@ func parseConfigFile() (*daemon.Config, error) {
 	}
 }
 
+func WaitForSignal(ctx context.Context) {
+	<-ctx.Done()
+	log.Panicf("Server is shutted down!")
+}
+
 func main() {
 	cfg, err := parseConfigFile()
 	if err != nil {
-		fmt.Printf("Error in main! %v \n", err.Error())
-		return
+		log.Panicf("Error in main! %v \n", err.Error())
 		/// it can be done with log.Panic() or simply panic()
 	}
-	if err := cfg.Start(); err != nil {
-		fmt.Printf("Error in main! %v \n", err.Error())
-		return
+	context, err := cfg.Start()
+	if err != nil {
+		log.Panicf("Error in main! %v \n", err.Error())
 	}
+	WaitForSignal(context)
 }
