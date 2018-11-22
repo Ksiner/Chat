@@ -3,7 +3,7 @@
 
 
 
-var addr = "http://90.188.151.177/";
+var addr = "http://yourAddressHere!!!/";
 var messageAddr = "";
 var usersAddr = "";
 var currentUser = "";
@@ -183,16 +183,6 @@ function ajax_get_users(url,cacheArray,callback,elemTypeFunc,elemAddFunc) {
     xmlhttp.send();
 }
 
-// function ajax_get_users(url,callback){
-//     let xmlhttp = new XMLHttpRequest();
-//     xmlhttp.open("GET",url,true);
-//     xmlhttp.onreadystatechange = function(){
-//         if (xmlhttp.readyState === 4 && xmlhttp.status === 200){
-//             callback(JSON.parse(xmlhttp.responseText),insertUserDivs);
-//         }
-//     }
-//     xmlhttp.send();
-// }
 
 function ajax_post_message(Obj,url){
     let xmlhttp = new XMLHttpRequest();

