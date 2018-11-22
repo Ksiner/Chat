@@ -1,27 +1,79 @@
 //import {$,jQuery} from 'jQuery'
-messageTemplateInit();
 
 
 
-var addr = "http://192.168.1.104:8080";
-var currentUser = "me"
+
+var addr = "http://90.188.151.177/";
+var messageAddr = "";
+var usersAddr = "";
+var currentUser = "";
+var targetUser = "";
 var root = document.getElementById("root");
 var dataArray = new Array();
-debugger;
+var userArray = new Array();
+
 var messageContainer = document.getElementsByClassName("messageDiv")[0];
+var formCurrentTargetUser = document.getElementById("currentTargetUser")
 var userContainer = document.getElementsByClassName("userDiv")[0];
 var messageInputDiv = document.getElementsByClassName("messageInputDiv")[0];
 var messageInputArea = document.getElementsByClassName("messageInputArea")[0];
 messageInputArea.onkeyup = sendMessage;
 
+
+ParseURLArgs(addr);
+
+
+
+function ParseURLArgs(addres){
+    let url = new URL(window.location.href)
+    currentUser = url.searchParams.get("username")
+    if (currentUser == null){
+        window.location = addres
+        return
+    }
+    targetUser = url.searchParams.get("targetuser")
+    if (targetUser==null){
+        targetUser = ""
+    }
+    messageAddr = addr+"messages/request?username="+currentUser+"&targetuser="+targetUser
+    usersAddr = addr+"users/request?username="+currentUser
+    userTemplateInit();
+    messageTemplateInit();
+}
+
 //var messageGetUser = addr+"/messages/users";
-var messageAddr = addr+"/messages/request";
+
+
 // var messageGetAddr = addr+"/messages/get";
 // var messagePostAddr = addr+"/messages/send";
 
+function updateMessageAddr(){
+    messageAddr = addr+"messages/request?username="+currentUser+"&targetuser="+targetUser;
+}
+
+
+function changeTargetUser(userDiv){
+    return function(){ 
+        if(targetUser == userDiv.childNodes[0].innerText){
+            return;
+        }
+        targetUser = userDiv.childNodes[0].innerText;
+        dataArray = new Array();
+        while(messageContainer.firstChild){
+            messageContainer.removeChild(messageContainer.firstChild);
+        }
+        formCurrentTargetUser.innerText = targetUser;
+        updateMessageAddr();
+    }
+}
+
+function userTemplateInit(){
+    ajax_get_users(usersAddr,userArray,callbackGet,addUserElemetsToItsDivs,insertUserDivs);
+    setTimeout(userTemplateInit,2000);
+}
+
 function messageTemplateInit(){
-    // ajax_post_users(messageAddr,callbackGet,insertUserDivs);
-    ajax_get(messageAddr, callbackGet,insetrIntoDivFileds);
+    ajax_get_messages(messageAddr,dataArray, callbackGet,addMessageElemetsToItsDivs,insetrIntoDivFileds);
     setTimeout(messageTemplateInit,1000);
 }
 
@@ -47,33 +99,42 @@ function unixToDate(unix_timestamp){
 }
 
 function insetrIntoDivFileds(div,element){
-    div.childNodes[0].innerText = element.user;
+    div.childNodes[0].innerText = element.userfrom;
     div.childNodes[1].innerText = element.message;
     div.childNodes[2].innerText = unixToDate(element.date);
     messageContainer.appendChild(div);
 }
 
-function insertUserDivs(div,element){
+function insertUserDivs(element){
     let userDiv = document.createElement("div");
+    userDiv.className = "container user"
     let userDivChild = document.createElement("p");
-    userDivChild.innerText=element;
+    userDivChild.innerText=element.Name;
+    userDivChild.onclick = changeTargetUser(userDiv);
     userDiv.appendChild(userDivChild);
     userContainer.appendChild(userDiv);
 }
 
-var callbackGet = function (data,elemAddFunc) {
+function addMessageElemetsToItsDivs(element,elemAddFunc){
+    if (element.userfrom === currentUser) {
+        debugger;
+        let myMessageDv = initDiv("container", "time-right");
+        elemAddFunc(myMessageDv,element);
+    } else {
+        debugger;
+        let = messageDiv = initDiv("container darker", "time-left");
+        elemAddFunc(messageDiv,element);
+    }
+}
+function addUserElemetsToItsDivs(element,elemAddFunc){
+        elemAddFunc(element);
+}
+
+function callbackGet(data,cacheArray,elemTypeFunc,elemAddFunc) {
     data.forEach(element => {
-        if(dataArray.find(cacheElem=>JSON.stringify(cacheElem)==JSON.stringify(element))==undefined){
-            dataArray.push(element);
-            if (element.user === currentUser) {
-                debugger;
-                let myMessageDv = initDiv("container", "time-right");
-                elemAddFunc(myMessageDv,element);
-            } else {
-                debugger;
-                let = messageDiv = initDiv("container darker", "time-left");
-                elemAddFunc(messageDiv,element);
-            }
+        if(cacheArray.find(cacheElem=>JSON.stringify(cacheElem)==JSON.stringify(element))==undefined){
+            cacheArray.push(element);
+            elemTypeFunc(element,elemAddFunc)
         } 
     });
 }
@@ -82,18 +143,17 @@ var callbackGet = function (data,elemAddFunc) {
 
 
 
-function ajax_get(url, callback,elemAddFunc) {
-    var xmlhttp = new XMLHttpRequest();
+function ajax_get_messages(url,cacheArray,callback,elemTypeFunc,elemAddFunc) {
+    let xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function () {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-            console.log("Responce text: " + xmlhttp.responseText);
             try {
                 var data = JSON.parse(xmlhttp.responseText);
             } catch (err) {
                 console.log(err.message + " in " + xmlhttp.responseText);
             }
             if(elemAddFunc !== undefined){
-                callback(data,elemAddFunc)
+                callback(data,cacheArray,elemTypeFunc,elemAddFunc)
             }else{
                 callback(data);
             }
@@ -103,28 +163,47 @@ function ajax_get(url, callback,elemAddFunc) {
     xmlhttp.send();
 }
 
-function ajax_post_users(Obj,url,callback){
-    var xmlhttp = new XMLHttpRequest();
-    xmlhttp.open("POST",url,true);
-    xmlhttp.setRequestHeader("Content-Type","application/json; charset=utf-8");
-    xmlhttp.onreadystatechange = function(){
-        if (xmlhttp.readyState === 4 && xmlhttp.status === 200){
-            callback(JSON.parse(xmlhttp.responseText),insertUserDivs);
+function ajax_get_users(url,cacheArray,callback,elemTypeFunc,elemAddFunc) {
+    let xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function () {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            try {
+                var data = JSON.parse(xmlhttp.responseText);
+            } catch (err) {
+                console.log(err.message + " in " + xmlhttp.responseText);
+            }
+            if(elemAddFunc !== undefined){
+                callback(data,cacheArray,elemTypeFunc,elemAddFunc)
+            }else{
+                callback(data);
+            }
         }
-    }
-    xmlhttp.send(JSON.stringify(obj));
+    };
+    xmlhttp.open("GET", url, true);
+    xmlhttp.send();
 }
 
-function ajax_post_message(Obj,url,callback){
-    var xmlhttp = new XMLHttpRequest();
+// function ajax_get_users(url,callback){
+//     let xmlhttp = new XMLHttpRequest();
+//     xmlhttp.open("GET",url,true);
+//     xmlhttp.onreadystatechange = function(){
+//         if (xmlhttp.readyState === 4 && xmlhttp.status === 200){
+//             callback(JSON.parse(xmlhttp.responseText),insertUserDivs);
+//         }
+//     }
+//     xmlhttp.send();
+// }
+
+function ajax_post_message(Obj,url){
+    let xmlhttp = new XMLHttpRequest();
     xmlhttp.open("POST",url,true);
     xmlhttp.setRequestHeader("Content-Type","application/json; charset=utf-8");
     xmlhttp.onreadystatechange = function(){
         if (xmlhttp.readyState === 4 && xmlhttp.status === 200){
-            alert("Message sended!");
+            //alert("Message sended!");
         }
     }
-    xmlhttp.send(JSON.stringify(obj));
+    xmlhttp.send(JSON.stringify(Obj));
 }
 
 function init_elem(elemTag, className) {
@@ -144,13 +223,15 @@ function initDiv(divClassName, spanClassName) {
 
 function sendMessage(event){
     if(event.keyCode==13){
+        if (targetUser=="")
+            return
         obj = {
-            user: currentUser,
+            userfrom: currentUser,
+            userto: targetUser,
             message: messageInputArea.value/*.replace('\n','')*/,
-            date: Date.now(),
-            my:true
+            date: Date.now()
         };
-        ajax_post_message(obj,messageAddr,insetrIntoDivFileds);
+        ajax_post_message(obj,messageAddr);
         messageInputArea.value = "";
     }
 }

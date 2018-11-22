@@ -7,6 +7,28 @@
     margin: 10px 0;
 }
 
+.currentTargetP{
+    float: right;
+}
+
+.user{
+    width: :auto;
+}
+
+.authContainer{
+    position: absolute;
+    border: 2px solid #dedede;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    padding: 10px;
+    width: 200px;
+    height: 100px;
+    top: 50%;
+    left: 50%;
+    display: inline-grid;
+    transform: translate(-50%,-50%);
+}
+
 .messageInputDiv{
     margin:auto;
     height: 50px;

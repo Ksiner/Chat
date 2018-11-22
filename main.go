@@ -48,7 +48,6 @@ func main() {
 	cfg, err := parseConfigFile()
 	if err != nil {
 		log.Panicf("Error in main! %v \n", err.Error())
-		/// it can be done with log.Panic() or simply panic()
 	}
 	context, err := cfg.Start()
 	if err != nil {
