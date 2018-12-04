@@ -83,7 +83,8 @@ func getFiles(w http.ResponseWriter, r *http.Request) {
 func checkUnauthorize(w http.ResponseWriter, r *http.Request) *http.Cookie {
 	cookie, err := r.Cookie("username")
 	if err != nil {
-		authorizeForm(w, r)
+		w.WriteHeader(401)
+		w.Write([]byte("Unauthorized!"))
 		return nil
 	}
 	// fmt.Printf("COOKIE!!! %v \n", cookie.Value)

@@ -1,4 +1,4 @@
 {
     "listen": "localhost:8080",
-    "dbconn": "Your connection string here!"
+    "dbconn": "dbuser:Cgenybr_57@/chat?charset=utf8&parseTime=True&loc=Local"
 }

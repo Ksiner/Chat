@@ -157,11 +157,14 @@ function ajax_get_messages(url,cacheArray,callback,elemTypeFunc,elemAddFunc) {
                     console.log(err.message + " in " + xmlhttp.responseText);
                 }
                 if(elemAddFunc !== undefined){
-                    callback(data,cacheArray,elemTypeFunc,elemAddFunc)
+                    callback(data,cacheArray,elemTypeFunc,elemAddFunc);
                 }else{
                     callback(data);
                 }
             }
+        }
+        if (xmlhttp.status == 401) {
+            window.location = addr;
         }
     };
     xmlhttp.open("GET", url, true);
