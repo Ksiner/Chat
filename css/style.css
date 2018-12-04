@@ -1,9 +1,7 @@
 /* Chat containers */
 
 .generalDiv{
-    position: absolute;
-    left: 40%;
-    right: 50%;
+    margin: 10px;
 }
 
 body{
@@ -16,6 +14,7 @@ body{
     border-radius: 5px;
     padding: 10px;
     margin: 10px;
+    margin-top: 0px;
     color: hsla(210, 100%, 75%, 1.0);
 }
 
@@ -64,10 +63,10 @@ body{
 
 .userDiv{
     overflow:auto;
-    position: absolute;
-    left: 30%;
-    right: 60%;
+    overflow-x: hidden;
     scroll-behavior: smooth;
+    height: 555px;
+    margin: 10px;
 }
 
 .messageDiv{
