@@ -1,8 +1,8 @@
-var addr = "http://yourAddressHere!!!/";
+var addr = "http://localhost:8080/";
 var inputField = document.getElementById("input");
-inputField.onkeydown = 
+inputField.onkeydown = authUser
 
-function authUser(){
+function authUser(event){
     if(event.keyCode==13){
         if(inputField.value !="")
             authorize(addr+"authorize?username="+inputField.value)

@@ -3,7 +3,7 @@
 
 
 
-var addr = "http://yourAddressHere!!!/";
+var addr = "http://localhost:8080/";
 var messageAddr = "";
 var usersAddr = "";
 var currentUser = "";
@@ -17,6 +17,7 @@ var formCurrentTargetUser = document.getElementById("currentTargetUser")
 var userContainer = document.getElementsByClassName("userDiv")[0];
 var messageInputDiv = document.getElementsByClassName("messageInputDiv")[0];
 var messageInputArea = document.getElementsByClassName("messageInputArea")[0];
+var prevUser;
 messageInputArea.onkeyup = sendMessage;
 
 
@@ -24,19 +25,21 @@ ParseURLArgs(addr);
 
 
 
-function ParseURLArgs(addres){
+function ParseURLArgs(address){
     let url = new URL(window.location.href)
-    currentUser = url.searchParams.get("username")
-    if (currentUser == null){
-        window.location = addres
-        return
-    }
+    // currentUser = url.searchParams.get("username")
+    // if (currentUser == null){
+    //     window.location = address
+    //     return
+    // }
     targetUser = url.searchParams.get("targetuser")
     if (targetUser==null){
         targetUser = ""
     }
-    messageAddr = addr+"messages/request?username="+currentUser+"&targetuser="+targetUser
-    usersAddr = addr+"users/request?username="+currentUser
+    // messageAddr = addr+"messages/request?username="+currentUser+"&targetuser="+targetUser
+    messageAddr = addr+"messages/request?targetuser="+targetUser
+    // usersAddr = addr+"users/request?username="+currentUser
+    usersAddr = addr+"users/request"
     userTemplateInit();
     messageTemplateInit();
 }
@@ -48,7 +51,8 @@ function ParseURLArgs(addres){
 // var messagePostAddr = addr+"/messages/send";
 
 function updateMessageAddr(){
-    messageAddr = addr+"messages/request?username="+currentUser+"&targetuser="+targetUser;
+    // messageAddr = addr+"messages/request?username="+currentUser+"&targetuser="+targetUser;
+    messageAddr = addr+"messages/request?targetuser="+targetUser;
 }
 
 
@@ -62,7 +66,12 @@ function changeTargetUser(userDiv){
         while(messageContainer.firstChild){
             messageContainer.removeChild(messageContainer.firstChild);
         }
-        formCurrentTargetUser.innerText = targetUser;
+        for(div of userContainer.childNodes){
+            div.style.backgroundColor = "";
+            div.style.borderColor = "";
+        }
+        userDiv.style.backgroundColor = "#0074D9";
+        userDiv.style.borderColor ="#0074D9";
         updateMessageAddr();
     }
 }
@@ -117,11 +126,9 @@ function insertUserDivs(element){
 
 function addMessageElemetsToItsDivs(element,elemAddFunc){
     if (element.userfrom === currentUser) {
-        debugger;
         let myMessageDv = initDiv("container", "time-right");
         elemAddFunc(myMessageDv,element);
     } else {
-        debugger;
         let = messageDiv = initDiv("container darker", "time-left");
         elemAddFunc(messageDiv,element);
     }
@@ -139,23 +146,21 @@ function callbackGet(data,cacheArray,elemTypeFunc,elemAddFunc) {
     });
 }
 
-
-
-
-
 function ajax_get_messages(url,cacheArray,callback,elemTypeFunc,elemAddFunc) {
     let xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function () {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-            try {
-                var data = JSON.parse(xmlhttp.responseText);
-            } catch (err) {
-                console.log(err.message + " in " + xmlhttp.responseText);
-            }
-            if(elemAddFunc !== undefined){
-                callback(data,cacheArray,elemTypeFunc,elemAddFunc)
-            }else{
-                callback(data);
+            if (xmlhttp.responseText != "") {
+                try {
+                    var data = JSON.parse(xmlhttp.responseText);
+                } catch (err) {
+                    console.log(err.message + " in " + xmlhttp.responseText);
+                }
+                if(elemAddFunc !== undefined){
+                    callback(data,cacheArray,elemTypeFunc,elemAddFunc)
+                }else{
+                    callback(data);
+                }
             }
         }
     };
@@ -167,15 +172,17 @@ function ajax_get_users(url,cacheArray,callback,elemTypeFunc,elemAddFunc) {
     let xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function () {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-            try {
-                var data = JSON.parse(xmlhttp.responseText);
-            } catch (err) {
-                console.log(err.message + " in " + xmlhttp.responseText);
-            }
-            if(elemAddFunc !== undefined){
-                callback(data,cacheArray,elemTypeFunc,elemAddFunc)
-            }else{
-                callback(data);
+            if (xmlhttp.responseText != "" || xmlhttp.responseText !== undefined) {
+                try {
+                    var data = JSON.parse(xmlhttp.responseText);
+                } catch (err) {
+                    console.log(err.message + " in " + xmlhttp.responseText);
+                }
+                if(elemAddFunc !== undefined){
+                    callback(data,cacheArray,elemTypeFunc,elemAddFunc)
+                }else{
+                    callback(data);
+                }
             }
         }
     };
@@ -203,7 +210,6 @@ function init_elem(elemTag, className) {
 }
 
 function initDiv(divClassName, spanClassName) {
-    debugger;
     let div = init_elem("div", divClassName);
     div.appendChild(init_elem("p", "userName"));
     div.appendChild(init_elem("p", "messageText"));

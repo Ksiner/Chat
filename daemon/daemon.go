@@ -1,11 +1,12 @@
 package daemon
 
 import (
-	"Chat/db"
-	"Chat/model"
-	"Chat/ui"
 	"context"
 	"net"
+
+	"github.com/Ksiner/Chat/db"
+	"github.com/Ksiner/Chat/model"
+	"github.com/Ksiner/Chat/ui"
 )
 
 type Config struct {

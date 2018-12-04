@@ -1,11 +1,12 @@
 package main
 
 import (
-	"Chat/daemon" /// w/o go mod it doesn't work
 	"context"
 	"encoding/json"
 	"io/ioutil"
 	"log"
+
+	"github.com/Ksiner/Chat/daemon" /// w/o go mod it doesn't work
 
 	_ "github.com/lib/pq" /// it should be a strong need to import package into current one
 )

@@ -1,11 +1,12 @@
 package db
 
 import (
-	"Chat/model"
 	"fmt"
 
+	"github.com/Ksiner/Chat/model"
+
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
 )
 
 type Config struct {
@@ -22,7 +23,7 @@ type sqlCommands struct {
 }
 
 func InitDbCmds(cfg Config) (*sqlCommands, error) {
-	if dbConn, err := sqlx.Connect("postgres", cfg.CnString); err != nil {
+	if dbConn, err := sqlx.Connect("mysql", cfg.CnString); err != nil {
 		return nil, err
 	} else {
 		if err := dbConn.Ping(); err != nil {
@@ -37,27 +38,27 @@ func InitDbCmds(cfg Config) (*sqlCommands, error) {
 }
 
 func (cmds *sqlCommands) PrepareStatements() error {
-	if sqlSelectCurrentUserCmd, err := cmds.conn.PrepareNamed("Select true from public.\"User\" where \"user\"=:name limit 1"); err != nil {
+	if sqlSelectCurrentUserCmd, err := cmds.conn.PrepareNamed("Select true from chat.users where username=:name limit 1"); err != nil {
 		return err
 	} else {
 		cmds.sqlSelectCurrentUserCmd = sqlSelectCurrentUserCmd
 	}
-	if sqlSelectUsersCmd, err := cmds.conn.PrepareNamed("Select \"user\" as name from public.\"User\" where \"user\"!=:name"); err != nil {
+	if sqlSelectUsersCmd, err := cmds.conn.PrepareNamed("Select username as name from chat.users where username!=:name "); err != nil {
 		return err
 	} else {
 		cmds.sqlSelectUsersCmd = sqlSelectUsersCmd
 	}
-	if sqlInsertUserCmd, err := cmds.conn.PrepareNamed("Insert into \"User\" values(:name)"); err != nil {
+	if sqlInsertUserCmd, err := cmds.conn.PrepareNamed("Insert into chat.users values(:name)"); err != nil {
 		return err
 	} else {
 		cmds.sqlInsertUserCmd = sqlInsertUserCmd
 	}
-	if sqlSelectMessagesCmd, err := cmds.conn.PrepareNamed("Select message,\"userFrom\" as userfrom,\"userTo\" as userto,date FROM message where (\"userFrom\"=:currentuser and \"userTo\"=:targetuser) or (\"userFrom\"=:targetuser and \"userTo\"=:currentuser) ORDER BY date"); err != nil {
+	if sqlSelectMessagesCmd, err := cmds.conn.PrepareNamed("Select message,userFrom as userfrom,userTo as userto,date FROM chat.messages where (userFrom=:currentuser and userTo=:targetuser) or (userFrom=:targetuser and userTo=:currentuser) ORDER BY date"); err != nil {
 		return err
 	} else {
 		cmds.sqlSelectMessagesCmd = sqlSelectMessagesCmd
 	}
-	if sqlInsertMessageCmd, err := cmds.conn.PrepareNamed("INSERT INTO message (message,\"userFrom\",\"userTo\",date) VALUES (:message,:userfrom,:userto,:date)"); err != nil {
+	if sqlInsertMessageCmd, err := cmds.conn.PrepareNamed("INSERT INTO chat.messages (message,userFrom,userTo,date) VALUES (:message,:userfrom,:userto,:date)"); err != nil {
 		return err
 	} else {
 		cmds.sqlInsertMessageCmd = sqlInsertMessageCmd

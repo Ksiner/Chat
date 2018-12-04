@@ -1,4 +1,4 @@
 {
-    "listen": "yourAddressHere!!!",
-    "dbconn": "user=postgres password=yourPassHere!!! dbname=postgres sslmode=disable"
+    "listen": "localhost:8080",
+    "dbconn": "dbuser:Cgenybr_57@/wiki?charset=utf8&parseTime=True&loc=Local"
 }
