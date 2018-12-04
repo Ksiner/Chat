@@ -86,7 +86,7 @@ func checkUnauthorize(w http.ResponseWriter, r *http.Request) *http.Cookie {
 		authorizeForm(w, r)
 		return nil
 	}
-	fmt.Printf("COOKIE!!! %v \n", cookie.Value)
+	// fmt.Printf("COOKIE!!! %v \n", cookie.Value)
 	return cookie
 }
 
